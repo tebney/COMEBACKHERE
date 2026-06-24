@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Vec};
+use soroban_sdk::{contract, contractimpl, contracttype, contracterror, Address, Env, Symbol, Vec};
 
 #[contracttype]
 pub enum SettlementStatus {
@@ -107,6 +107,18 @@ impl TreasuryContract {
         Vec::new(&e)
     }
 
+    fn check_admin(e: &Env, admin: &Address) {
+        admin.require_auth();
+        let stored_admin: Address = e
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .unwrap();
+        if stored_admin != *admin {
+            panic_with_error!(&e, TreasuryError::Unauthorized);
+        }
+    }
+
     pub fn pause(e: Env, admin: Address) {
         admin.require_auth();
         e.storage().instance().set(&DataKey::Paused, &true);
@@ -115,6 +127,20 @@ impl TreasuryContract {
     pub fn unpause(e: Env, admin: Address) {
         admin.require_auth();
         e.storage().instance().set(&DataKey::Paused, &false);
+    }
+
+    pub fn update_threshold(e: Env, admin: Address, new_threshold: u32) {
+        Self::check_admin(&e, &admin);
+        if new_threshold == 0 {
+            panic_with_error!(&e, TreasuryError::InvalidThreshold);
+        }
+        let old_threshold: u64 = e.storage().instance().get(&DataKey::Threshold).unwrap_or(0u64);
+        let threshold = new_threshold as u64;
+        e.storage().instance().set(&DataKey::Threshold, &threshold);
+        e.events().publish(
+            (Symbol::new(&e, "threshold_updated"),),
+            (old_threshold, threshold),
+        );
     }
 
     pub fn raise_dispute(e: Env, signer: Address, settlement_id: u64, reason: u32) {
@@ -151,6 +177,8 @@ pub enum TreasuryError {
     ContractPaused = 1,
     NotPending = 2,
     InsufficientApprovals = 3,
+    InvalidThreshold = 4,
+    Unauthorized = 5,
 }
 
 #[contracttype]
