@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_HORIZON_URL: string
   readonly VITE_NETWORK_PASSPHRASE: string
   readonly VITE_INVOICE_CONTRACT_ID: string
+  readonly VITE_COMPLIANCE_CONTRACT_ID: string
 }
 
 interface ImportMeta {

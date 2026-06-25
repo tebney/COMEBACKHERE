@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react"
 import { InvoicePayment } from "./components/InvoicePayment"
 import { RefundRequest } from "./components/RefundRequest"
+import { ComplianceManager } from "./components/ComplianceManager"
 import { useInvoice } from "./hooks/useInvoice"
 import { useWallet } from "./hooks/useWallet"
 import "./App.css"
 
-type Tab = "payment" | "refund"
+type Tab = "payment" | "refund" | "compliance"
 
 function RefundTab() {
   const { invoice, loading, error, loadInvoice, refund } = useInvoice()
@@ -114,10 +115,22 @@ export default function App() {
         >
           Request Refund
         </button>
+        <button
+          className={`tab ${tab === "compliance" ? "tab--active" : ""}`}
+          onClick={() => setTab("compliance")}
+        >
+          Compliance
+        </button>
       </nav>
 
       <main className="app-main">
-        {tab === "payment" ? <InvoicePayment /> : <RefundTab />}
+        {tab === "payment" ? (
+          <InvoicePayment />
+        ) : tab === "refund" ? (
+          <RefundTab />
+        ) : (
+          <ComplianceManager />
+        )}
       </main>
     </div>
   )
