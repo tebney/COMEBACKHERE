@@ -1,0 +1,9 @@
+# CODEOWNERS
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+contracts/   @dreamgeneX
+scripts/     @dreamgeneX
+docs/        @dreamgeneX
+
+comebackhere-frontend/   @dreamgeneX
+frontend/                @dreamgeneX

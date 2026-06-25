@@ -103,8 +103,41 @@ impl TreasuryContract {
         }
     }
 
-    pub fn get_pending_settlements(e: Env) -> Vec<u64> {
-        Vec::new(&e)
+    pub fn get_pending_settlements(
+        e: Env,
+        offset: Option<u64>,
+        limit: Option<u64>,
+    ) -> Vec<u64> {
+        let cap: u64 = limit.unwrap_or(100).min(100);
+        let skip: u64 = offset.unwrap_or(0);
+        let next_id: u64 = e
+            .storage()
+            .instance()
+            .get(&DataKey::NextSettlementId)
+            .unwrap_or(1u64);
+
+        let mut result: Vec<u64> = Vec::new(&e);
+        let mut matched: u64 = 0;
+        let mut collected: u64 = 0;
+
+        let mut id: u64 = 1;
+        while id < next_id && collected < cap {
+            if let Some(s) = e
+                .storage()
+                .instance()
+                .get::<DataKey, Settlement>(&DataKey::Settlement(id))
+            {
+                if matches!(s.status, SettlementStatus::Pending) {
+                    if matched >= skip {
+                        result.push_back(id);
+                        collected += 1;
+                    }
+                    matched += 1;
+                }
+            }
+            id += 1;
+        }
+        result
     }
 
     pub fn pause(e: Env, admin: Address) {

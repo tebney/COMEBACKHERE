@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import DashboardLayout from "./components/Dashboard/DashboardLayout";
 import SettlementProposalForm from "./components/SettlementProposal/SettlementProposalForm";
+import ABIExplorer from "./components/ABIExplorer";
 
 function InvoicesPage() {
   return <p>Invoices list will appear here.</p>;
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="settlements" element={<SettlementsPage />} />
         <Route path="disputes" element={<DisputesPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="abi" element={<ABIExplorer />} />
       </Route>
     </Routes>
   );
